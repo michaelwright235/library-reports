@@ -1,0 +1,73 @@
+#libraries_table, #libraries_table input {
+    width:100%;
+}
+#libraries_table tr:first-child {
+    background: #DDD;
+    font-weight: bold;
+}
+
+#datepicker {
+    background-color: #fff;
+    cursor:pointer;
+}
+            
+#library_plus_btn {
+    width: 30px;
+    height: 30px;
+}
+
+.library-report-table th {
+    width:400px;
+    font-weight: normal;
+    padding: 10px 10px 20px 0;
+}
+.library-report-table td {
+    padding: 10px 10px;
+}
+
+input.wrong-value {
+    background-color:#fdd;
+}
+
+#library-reports-form-status {
+    color: salmon;
+}
+td.dayHasReport .ui-state-default {
+    background-color: #87f589;
+}
+#reportPrint span {
+    font-size: 25px;
+    text-decoration: none;
+}
+
+/* Export Page */
+
+#datepickerFrom, #datepickerTo, #datepickerSingleDate {
+    background-color: #fff;
+    cursor:pointer;
+}
+table.no-td-padding td {
+    padding-top: 0;
+}
+table.no-td-padding input[type=radio] {
+    margin-left:0;
+    margin-top:0;
+}
+
+table.no-td-padding tr > td {
+    padding-left:0;
+}
+
+table.library_export_result {
+    border: 1px solid rgb(133, 133, 133);
+    border-collapse: collapse;
+}
+table.library_export_result th {
+    text-align: left;
+    font-weight: bold;
+}
+table.library_export_result th, table.library_export_result td {
+    border: 1px solid rgb(133, 133, 133);
+    padding: 10px;
+ }
+ 
