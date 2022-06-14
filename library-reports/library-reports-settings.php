@@ -191,6 +191,11 @@ class LibraryReportsSettings {
         /> 
         <?php
     }
+
+    public static function enqueue_styles_scripts() {
+        wp_enqueue_style('library-reports-style', plugins_url('library-reports/library-reports-styles.css'));
+        wp_enqueue_script('library_report_script', plugins_url('library-reports/library-reports-settings-script.js'));    
+    }
 }
 
 add_action( 'admin_menu', array('LibraryReportsSettings','create_menu'));
@@ -203,11 +208,6 @@ add_action('admin_post_'.LibraryReportsSettings::SETTINGS_IMPORT_ACTION, functio
     wp_redirect($_POST['_wp_http_referer']);
 });
 
-function library_reports_enqueue() { 
-    wp_enqueue_style('library-reports-style', plugins_url('library-reports/library-reports-styles.css'));
-    wp_enqueue_script('library_report_script', plugins_url('library-reports/library-reports-settings-script.js'));
-}
-
 if(isset($_GET['page']) && $_GET['page'] == 'library-reports-settings') {
-    add_action( 'admin_enqueue_scripts', 'library_reports_enqueue' );
+    add_action( 'admin_enqueue_scripts', array('LibraryReportsSettings', 'enqueue_styles_scripts') );
 }

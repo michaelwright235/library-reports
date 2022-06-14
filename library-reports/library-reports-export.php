@@ -138,7 +138,7 @@ class LibraryReportsExport {
         }
     }
 
-    public static function equeue_styles_scripts() {
+    public static function enqueue_styles_scripts() {
         wp_enqueue_script('jquery-ui-datepicker');
         wp_enqueue_style('jquery-ui', 'https://code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css');  
         wp_enqueue_script('library_report_script', plugins_url('library-reports/library-reports-export-script.js'));
@@ -149,7 +149,7 @@ class LibraryReportsExport {
 add_action( 'admin_menu', array('LibraryReportsExport', 'create_menu'));
 
 if(isset($_GET['page']) && $_GET['page'] == LibraryReportsExport::PAGE_NAME) {
-    add_action( 'admin_enqueue_scripts', array('LibraryReportsExport', 'equeue_styles_scripts') );
+    add_action( 'admin_enqueue_scripts', array('LibraryReportsExport', 'enqueue_styles_scripts') );
 }
 
 if( wp_doing_ajax() ) {
