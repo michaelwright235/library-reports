@@ -161,12 +161,6 @@ jQuery(document).ready(function($) {
             return;
         }
         statusP.innerText = "";
-        
-        if(dayHasReport(document.querySelector("#datepicker").value)) {
-            document.querySelector("#form_action").value = "library_reports_update";
-        } else {
-            document.querySelector("#form_action").value = "library_reports_submit";
-        }
 
         $.ajax({
             url:      ajaxurl,

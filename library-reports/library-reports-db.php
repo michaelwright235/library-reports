@@ -3,6 +3,11 @@
 class LibraryReportsDb {
     const DB_NAME = 'library_reports';
 
+    /**
+     * Создает базу данных при первой активации плагина
+     *
+     * @return void
+     */
     public static function create_reports_db() {      
         global $wpdb; 
         $charset_collate = $wpdb->get_charset_collate();
@@ -17,7 +22,7 @@ class LibraryReportsDb {
                 UNIQUE KEY id (id)
         ) $charset_collate;";
     
-        //Check to see if the table exists already, if not, then create it
+        // Check to see if the table exists already, if not, then create it
         if($wpdb->get_var( "show tables like '$library_reports_sql'" ) != $library_reports_db ) 
         {
             require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
@@ -25,6 +30,11 @@ class LibraryReportsDb {
         }
     }
 
+    /**
+     * Добавляет или обновляет отчет, переданный в запросе POST
+     *
+     * @return void
+     */
     public static function create_db_entity() {
         global $wpdb; 
         $library_reports_db = $wpdb->prefix . self::DB_NAME;  // table name
@@ -48,84 +58,61 @@ class LibraryReportsDb {
             $content[$f] = $_POST[$f];
         }
 
-        $insertion = array(
-            'library_id' => $_POST['library'],
-            'report_creation_date' => date("Y-m-d H:i:s.u"),
-            'report_date' => $_POST['date'],
-            'content' => json_encode($content)
-        );
-        $format = array(
-            '%d',
-            '%s',
-            '%s',
-            '%s'
-        );
-        $result = $wpdb->insert($library_reports_db, $insertion, $format);
+        // Если отчета еще не существует, то добавляем
+        if( !self::report_exists($_POST['library'], $_POST['date']) ) {
+            $insertion = array(
+                'library_id' => $_POST['library'],
+                'report_creation_date' => date("Y-m-d H:i:s.u"),
+                'report_date' => $_POST['date'],
+                'content' => json_encode($content)
+            );
+            $format = array(
+                '%d',
+                '%s',
+                '%s',
+                '%s'
+            );
+            $result = $wpdb->insert($library_reports_db, $insertion, $format);
+            if($result !== false)
+                add_settings_error( 'library_reports_messages', 'library_reports_message', 'Отчет успешно добавлен', 'updated' );
+        }
+        // Если отчет нужно обновить
+        else {
+            $insertion = array(
+                'content' => json_encode($content)
+            );
+            $where = array(
+                'library_id' => $_POST['library'],
+                'report_date' => $_POST['date'],
+            );
+            $format = array(
+                '%s'
+            );
+            $formatWhere = array(
+                '%d',
+                '%s'
+            );
+            $result = $wpdb->update($library_reports_db, $insertion, $where, $format, $formatWhere);
+            if($result !== false)
+                add_settings_error( 'library_reports_messages', 'library_reports_message', 'Отчет успешно обновлен', 'updated' );
+        }
+
+        if($result === false) 
+            add_settings_error( 'library_reports_messages', 'library_reports_message', 'Ошибка запроса базы данных', 'error' );
         
-        add_settings_error( 'library_reports_messages', 'library_reports_message', "Отчет успешно добавлен", 'updated' );
+        LibraryReportsCommon::sendReportViaMail($_POST); // Посылаем письмо на почту
         settings_errors( 'library_reports_messages' );
-
-        LibraryReportsCommon::sendReportViaMail($_POST);
 
         exit();
     }
 
-    public static function update_db_entity() {
-        global $wpdb; 
-        $library_reports_db = $wpdb->prefix . self::DB_NAME;  // table name
-
-        // Проверка кода
-        if(!wp_verify_nonce($_POST['_wpnonce'], LibraryReportsFrontend::ACTION_NAME)) {
-            add_settings_error( 'library_reports_messages', 'library_reports_message', "Ошибка, попробуйте еще раз", 'error' );
-            settings_errors( 'library_reports_messages' );
-            exit();
-        }
-
-        // Проверка отчета
-        if(($checkResult = self::check_report($_POST, false)) !== true) {
-            add_settings_error( 'library_reports_messages', 'library_reports_message', "Ошибка: $checkResult", 'error' );
-            settings_errors( 'library_reports_messages' );
-            exit();
-        }
-
-        $content = [];
-        foreach(LibraryReportsCommon::FIELDS as $f => $v) {
-            $content[$f] = $_POST[$f];
-        }
-
-        $insertion = array(
-            'content' => json_encode($content)
-        );
-        $where = array(
-            'library_id' => $_POST['library'],
-            'report_date' => $_POST['date'],
-        );
-        $format = array(
-            '%s'
-        );
-        $formatWhere = array(
-            '%d',
-            '%s'
-        );
-        $wpdb->update(
-            $library_reports_db,
-            $insertion,
-            $where,
-            $format,
-            $formatWhere
-        );
-        add_settings_error( 'library_reports_messages', 'library_reports_message', "Отчет успешно обновлен", 'updated' );
-        settings_errors( 'library_reports_messages' );
-        LibraryReportsCommon::sendReportViaMail($_POST);
-        exit();
-    }
-
+    /**
+     * Импортирует данные из строки JSON
+     *
+     * @param string $JSONstring JSON строка
+     * @return int Количество внененных записей
+     */
     public static function import_reports($JSONstring) {
-        /*
-        $_contentJ = file_get_contents(__DIR__ . "/exportReports.txt");
-        $r = LibraryReportsDb::import_reports($_contentJ);
-        echo "Внесено: $r отчетов";
-        */
         global $wpdb; 
         $library_reports_db = $wpdb->prefix . self::DB_NAME;  // table name
 
@@ -150,7 +137,13 @@ class LibraryReportsDb {
         return $i;
     }
 
-    public static function check_report($report, $checkIfExists = true) {
+    /**
+     * Проверяет отчет на правильность
+     *
+     * @param array $report Массив с отчетом
+     * @return string|true Строка с ошибкой в случае неудачи, true в обратном случае
+     */
+    public static function check_report($report) {
         // Проверка на возможность вставки отчета пользователем
         $libId = $report['library'];
         if(!LibraryReportsCommon::is_library_available($libId))
@@ -161,9 +154,6 @@ class LibraryReportsDb {
         $date = DateTime::createFromFormat('Y-m-d', $rDate);
         if(!$date) {
             return "Указана неверная дата";
-        }
-        if($checkIfExists && self::report_exists($libId, $rDate)) {
-            return "Отчет за $rDate уже существует";
         }
 
         // Проверка на возможность создания отчета за эту дату
@@ -210,6 +200,13 @@ class LibraryReportsDb {
         return true;
     }
 
+    /**
+     * Проверяет, существует ли отчет за указанный день
+     *
+     * @param string $lib ID библиотеки
+     * @param string $date Дата
+     * @return bool
+     */
     public static function report_exists($lib, $date) {
         global $wpdb; 
         $library_reports_db = $wpdb->prefix . self::DB_NAME;  // table name
@@ -222,6 +219,14 @@ class LibraryReportsDb {
         return false;
     }
 
+    /**
+     * Получает отчеты данной библиотеки в промежуток дат
+     *
+     * @param string $lib ID библиотеки
+     * @param string $dateFrom Начальная дата
+     * @param string $dateTo Конечная дата
+     * @return array|false Массив c отчетами, либо false, если не найдено
+     */
     public static function get_reports_between_dates($lib, $dateFrom, $dateTo) {
         global $wpdb; 
         $library_reports_db = $wpdb->prefix . self::DB_NAME;  // table name
@@ -237,6 +242,12 @@ class LibraryReportsDb {
         return false;
     }
 
+    /**
+     * Получает все отчеты данной библиотеки
+     *
+     * @param string $lib ID библиотеки
+     * @return array|false Массив c отчетами, либо false, если не найдено
+     */
     public static function get_all_library_reports_dates($lib) {
         global $wpdb; 
         $library_reports_db = $wpdb->prefix . self::DB_NAME;  // table name
@@ -252,6 +263,13 @@ class LibraryReportsDb {
         return false;
     }
 
+    /**
+     * Получает отчет за один день данной библиотеки
+     *
+     * @param string $lib ID библиотеки
+     * @param string $date Дата отчета
+     * @return array|false Отчет, либо false, если не найдено
+     */
     public static function get_single_day_report($lib, $date) {
         global $wpdb; 
         $library_reports_db = $wpdb->prefix . self::DB_NAME;

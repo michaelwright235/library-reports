@@ -3,7 +3,6 @@
 class LibraryReportsFrontend {
     const ACTION_NAME = 'library_reports_submit';
     const SINGLE_REPORT_ACTION_NAME = 'library_reports_get_single_report';
-    const UPDATE_REPORT_ACTION_NAME = 'library_reports_update';
     const PAGE_NAME = 'library-reports';
 
     public function create_menu() { 
@@ -155,10 +154,6 @@ if( wp_doing_ajax() ) {
     add_action(
         'wp_ajax_'.LibraryReportsFrontend::ACTION_NAME,
         array('LibraryReportsDb', 'create_db_entity')
-    );
-    add_action(
-        'wp_ajax_'.LibraryReportsFrontend::UPDATE_REPORT_ACTION_NAME,
-        array('LibraryReportsDb', 'update_db_entity')
     );
     add_action(
         'wp_ajax_'.LibraryReportsFrontend::SINGLE_REPORT_ACTION_NAME,
