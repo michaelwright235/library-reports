@@ -92,8 +92,8 @@ class LibraryReportsFrontend {
         </script>
         <div class="wrap">
             <h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
-            <a href="javascript:window.print();" id="reportPrint"><span class="dashicons dashicons-printer"></span></a>
             <div id="resultsFor"></div>
+            <a href="javascript:window.print();" id="reportPrint"><span class="dashicons dashicons-printer"></span></a>
             <form action="<?php echo admin_url( 'admin.php' ); ?>" method="post" id="library-reports-report-form">
                 <table class="library-report-table form-table" role="presentation">
                     <?php foreach($fields as $name => $html) {?>
