@@ -193,12 +193,8 @@ class LibraryReportsSettings {
     }
 }
 
-add_action( 'admin_menu', function() {
-    LibraryReportsSettings::create_menu();
-});
-add_action( 'admin_init', function() {
-    LibraryReportsSettings::init_settings();
-});
+add_action( 'admin_menu', array('LibraryReportsSettings','create_menu'));
+add_action( 'admin_init', array('LibraryReportsSettings','init_settings'));
 
 add_action('admin_post_'.LibraryReportsSettings::SETTINGS_IMPORT_ACTION, function() {
     if(count($_FILES) === 1 && $_FILES['importReportsFile']) {

@@ -5,11 +5,11 @@ class LibraryReportsFrontend {
     const SINGLE_REPORT_ACTION_NAME = 'library_reports_get_single_report';
     const PAGE_NAME = 'library-reports';
 
-    public function create_menu() { 
-        add_menu_page('Отчет по дню', 'Отчет по дню', 'edit_posts', self::PAGE_NAME, array($this, 'draw_page'), 'dashicons-media-spreadsheet', 2);
+    public static function create_menu() { 
+        add_menu_page('Отчет по дню', 'Отчет по дню', 'edit_posts', self::PAGE_NAME, array('LibraryReportsFrontend', 'draw_page'), 'dashicons-media-spreadsheet', 2);
     }
 
-    public function draw_page() {
+    public static function draw_page() {
         $fields = [
             LibraryReportsCommon::LIBRARY_INPUT_DESC => LibraryReportsCommon::create_library_select_input('library'),
             LibraryReportsCommon::LIBRARY_DATE_DESC => '<input type="text" autocomplete="off" id="datepicker" readonly name="date">',
@@ -114,7 +114,7 @@ class LibraryReportsFrontend {
         <?php
     } 
 
-    public function create_numeric_input($name) {
+    public static function create_numeric_input($name) {
         return sprintf('<input type="text" autocomplete="off" inputmode="numeric" name="%1$s" id="%1$s">', $name);
     }
 
@@ -139,9 +139,7 @@ class LibraryReportsFrontend {
     }
 }
 
-add_action('admin_menu', function() {
-    ( new LibraryReportsFrontend() )->create_menu();
-});
+add_action('admin_menu', array('LibraryReportsFrontend', 'create_menu'));
 
 if(isset($_GET['page']) && $_GET['page'] == LibraryReportsFrontend::PAGE_NAME) {
     add_action(

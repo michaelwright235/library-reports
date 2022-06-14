@@ -4,16 +4,16 @@ class LibraryReportsExport {
     const EXPORT_ACTION = 'library_reports_export_action';
     const PAGE_NAME = 'library-reports-export';
 
-    public function create_menu() {
+    public static function create_menu() {
         add_submenu_page(
             LibraryReportsFrontend::PAGE_NAME,
             'Выгрузка отчетов',
             'Выгрузка',
             'edit_posts',
             self::PAGE_NAME,
-            array($this, 'draw_page'));
+            array('LibraryReportsExport', 'draw_page'));
     }
-    public function draw_page() {
+    public static function draw_page() {
         ?>
         <script>
             var LIBRARY_REPORTS_FIELD_NAMES = {};
@@ -146,9 +146,7 @@ class LibraryReportsExport {
     }
 }
 
-add_action( 'admin_menu', function() {
-    ( new LibraryReportsExport() ) -> create_menu();
-});
+add_action( 'admin_menu', array('LibraryReportsExport', 'create_menu'));
 
 if(isset($_GET['page']) && $_GET['page'] == LibraryReportsExport::PAGE_NAME) {
     add_action( 'admin_enqueue_scripts', array('LibraryReportsExport', 'equeue_styles_scripts') );
