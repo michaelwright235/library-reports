@@ -1,10 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const form = document.querySelector("#library-reports-settings-form");
+
     function initTable() {
-        const table = document.querySelector("#libraries_table");
-        for(const line of JSONdata) {
-            addLine(line['id'], line['name'], line['rights']);
-        }
+        if(Object.keys(JSONdata).length != 0)
+            for(const line of JSONdata) {
+                addLine(line['id'], line['name'], line['rights']);
+            }
     }
+    
     function addLine(id = '', name = '', rights= '') {
         const table = document.querySelector("#libraries_table");
         const tr = document.createElement("tr");
@@ -19,7 +22,19 @@ document.addEventListener('DOMContentLoaded', () => {
         tr.append(tdName);
 
         const tdRights = document.createElement("td");
-        tdRights.append(createInput('rights', rights));
+        const selectUsers = document.createElement("select");
+        selectUsers.classList.add('rights');
+        selectUsers.multiple = true;
+        rights = rights.split(',');
+        libraryReportsUsers.forEach((e) => {
+            let opt = document.createElement("option");
+            opt.value = e.id;
+            opt.textContent = e.name;
+            if(rights.includes(e.id)) opt.selected = true;
+            selectUsers.append(opt);
+        });
+        
+        tdRights.append(selectUsers);
         tr.append(tdRights);
 
         table.append(tr);
@@ -38,19 +53,26 @@ document.addEventListener('DOMContentLoaded', () => {
         let libraries = [];
         for(const line of lines) {
             let params = {};
-            const inputs = line.querySelectorAll("input");
-            for(const input of inputs) {
-                params[input.className] = input.value;
-            }
-            if(params['id'] != '') libraries.push(params);
+            params.id = line.querySelector(".id").value;
+            if(params.id.trim() == '') continue;
+
+            params.name = line.querySelector(".name").value;
+            let rightsSelector = line.querySelector(".rights");
+            let selectedRights = [];
+            for(o of rightsSelector) {
+                if(o.selected) selectedRights.push(o.value);
+            };
+            params.rights = selectedRights.join(',');
+
+            libraries.push(params);
         }
-        console.log(JSON.stringify(libraries));
         return JSON.stringify(libraries);
     }
 
-    document.forms[0].onsubmit = function(e) {
+    form.addEventListener("submit", () => {
         document.getElementById("libraries").value = createJSON();
-    };
-    document.getElementById('library_plus_btn').onclick = () => {addLine()};
+    });
+
+    document.getElementById('library_plus_btn').addEventListener("click", () => addLine());
     initTable();
 });

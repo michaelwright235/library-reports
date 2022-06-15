@@ -34,9 +34,20 @@ class LibraryReportsSettings {
         // show error/update messages
         settings_errors( 'library_reports_messages' );
         ?>
+        <script>
+            var libraryReportsUsers = 
+            <?php 
+                $users = get_users();
+                echo '[';
+                foreach($users as $user) {
+                    echo "{id: '$user->id', name: '$user->display_name'},";
+                }
+                echo ']';
+            ?>;
+        </script>
         <div class="wrap">
             <h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
-            <form action="options.php" method="post">
+            <form action="options.php" method="post" id="library-reports-settings-form">
                 <?php
                 // output security fields for the registered setting "wporg"
                 settings_fields( self::SETTINGS_PAGE );
@@ -61,7 +72,7 @@ class LibraryReportsSettings {
         add_settings_section(
             self::SETTINGS_SECTION_NAME, 
             '',  
-            array('LibraryReportsSettings', 'section_callback'),    
+            null,    
             self::SETTINGS_PAGE                   
         );
 
@@ -104,15 +115,6 @@ class LibraryReportsSettings {
                 'default' => '1'
             )
         );
-    }
-
-    // Описание секции
-    public static function section_callback($arg) {
-        //echo get_option('libraries') . "<br>";
-        $users = get_users();
-        foreach($users as $user) {
-            echo "ID: $user->id; Name: $user->display_name<br>";
-        }
     }
 
     public static function sanitize_edit_time($val) {
@@ -165,17 +167,14 @@ class LibraryReportsSettings {
         if (json_decode($data) == null) {
             $data = '{}';
         }
+        echo "<script>const JSONdata = $data;</script>"
         ?>
     
         <table id="libraries_table">
-            <tr><td>ID<br>(число)</td><td>Название</td><td>Права на добавление/редактирование<br>(ID пользователей через запятую)</td></tr>
+            <tr><td>ID (число)</td><td>Название</td><td>Права на добавление/редактирование</td></tr>
         </table>
         <button type="button" id="library_plus_btn">+</button>
         <input type="hidden" id="libraries" name="<?php echo $val['option_name']; ?>" value="<?php echo $data; ?>"/>
-        
-        <script>
-        const JSONdata = <?php echo $data; ?>; 
-        </script>
         <?php
     }
 
