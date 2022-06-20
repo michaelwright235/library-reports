@@ -155,4 +155,14 @@ class LibraryReportsCommon {
         
         wp_mail( $email, $subject, $content );
     }
+
+    public static function get_wp_notification(string $text, bool $isError = true) : string {
+        ob_start();
+        $type = $isError ? 'error' : 'updated';
+        add_settings_error( 'library_reports_messages', 'library_reports_message', $text, $type );
+        settings_errors( 'library_reports_messages' );
+        $contents = ob_get_contents();
+        ob_end_clean();
+        return $contents;
+    }
 }

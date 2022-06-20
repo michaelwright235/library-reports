@@ -4,17 +4,16 @@ document.addEventListener('DOMContentLoaded', () => {
     function initTable() {
         if(Object.keys(JSONdata).length != 0)
             for(const line of JSONdata) {
-                addLine(line['id'], line['name'], line['rights']);
+                addLine(line['id'], line['name'], line['rights'], line['category']);
             }
     }
     
-    function addLine(id = '', name = '', rights= '') {
+    function addLine(id = '', name = '', rights= '', category='') {
         const table = document.querySelector("#libraries_table");
         const tr = document.createElement("tr");
 
         const tdID = document.createElement("td");
         tdID.append(createInput('id', id));
-
         tr.append(tdID);
 
         const tdName = document.createElement("td");
@@ -33,9 +32,22 @@ document.addEventListener('DOMContentLoaded', () => {
             if(rights.includes(e.id)) opt.selected = true;
             selectUsers.append(opt);
         });
-        
         tdRights.append(selectUsers);
         tr.append(tdRights);
+
+        const tdCategory = document.createElement("td");
+        const selectCategory = document.createElement("select");
+        selectCategory.classList.add('category');
+        libraryReportsCategories.forEach((e) => {
+            let opt = document.createElement("option");
+            opt.value = e.id;
+            opt.textContent = e.name;
+            selectCategory.append(opt);
+        });
+        selectCategory.value = category;
+        
+        tdCategory.append(selectCategory);
+        tr.append(tdCategory);
 
         table.append(tr);
     }
@@ -63,6 +75,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 if(o.selected) selectedRights.push(o.value);
             };
             params.rights = selectedRights.join(',');
+
+            params.category = line.querySelector(".category").value;
 
             libraries.push(params);
         }

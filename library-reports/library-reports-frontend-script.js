@@ -167,7 +167,7 @@ jQuery(document).ready(function($) {
             type:     "POST",
             data: $("#library-reports-report-form").serialize(),
             success: (response) => { 
-                document.querySelector("#resultsFor").innerHTML = response;
+                document.querySelector("#resultsFor").innerHTML = response.data;
                 document.dispatchEvent(new Event("wp-updates-notice-added"));
                 window.scroll({
                     top: 0, 
@@ -191,10 +191,9 @@ jQuery(document).ready(function($) {
             url:      ajaxurl,
             type:     "POST",
             data: data,
-            success: (response) => { 
-                let jsonR = JSON.parse(response);
-                putCompletedReport(JSON.parse(jsonR[0].content));
-             },
+            success: (response) => {
+                putCompletedReport(JSON.parse(response.data[0].content));
+            },
             error: function(response) {
                 console.log(response);
             },

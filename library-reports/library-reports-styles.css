@@ -1,4 +1,4 @@
-#libraries_table, #libraries_table input {
+#libraries_table, #libraries_table input, #libraries_table select {
     width:100%;
 }
 #libraries_table tr:first-child {

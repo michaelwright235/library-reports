@@ -119,16 +119,14 @@ class LibraryReportsFrontend {
     }
 
     public static function ajax_get_single_report() {
-        if(!wp_verify_nonce($_POST['_wpnonce'], self::ACTION_NAME)) {
-            exit();
+        if(!wp_verify_nonce($_POST['_wpnonce'], self::ACTION_NAME) ||
+            !LibraryReportsCommon::is_library_available($_POST['library']) ||
+            !DateTime::createFromFormat('Y-m-d', $_POST['date'])) {
+            wp_send_json_error();
         }
-        if( !LibraryReportsCommon::is_library_available($_POST['library']) ||
-            !DateTime::createFromFormat('Y-m-d', $_POST['date']) ) {
-            exit();
-        }
-
-        echo json_encode(LibraryReportsDb::get_single_day_report($_POST['library'], $_POST['date']));
-        exit();
+        wp_send_json_success( 
+            LibraryReportsDb::get_single_day_report($_POST['library'], $_POST['date'])
+        );
     }
 
     public static function enqueue_styles_scripts() {

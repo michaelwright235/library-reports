@@ -44,6 +44,21 @@ class LibraryReportsSettings {
                 }
                 echo ']';
             ?>;
+            var libraryReportsCategories = 
+            <?php
+            $categories = get_categories( [
+                'taxonomy'     => 'category',
+                'type'         => 'post',
+                'orderby'      => 'name',
+                'order'        => 'ASC',
+            ] );
+            echo '[';
+            foreach($categories as $category) {
+                echo "{id: '$category->term_id', name: '$category->name'},";
+            }
+            echo ']';
+            ?>;
+
         </script>
         <div class="wrap">
             <h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
@@ -154,6 +169,8 @@ class LibraryReportsSettings {
             if(count($newRights) === 0) continue;
             $sanitizedLine['rights'] = implode(',', $newRights);
 
+            $sanitizedLine['category'] = trim($line->category);
+
             $sanitizedLines[] = $sanitizedLine;
         }
 
@@ -171,7 +188,12 @@ class LibraryReportsSettings {
         ?>
     
         <table id="libraries_table">
-            <tr><td>ID (число)</td><td>Название</td><td>Права на добавление/редактирование</td></tr>
+            <tr>
+                <td>ID (число)</td>
+                <td>Название</td>
+                <td>Права на добавление/редактирование</td>
+                <td>Категория</td>
+            </tr>
         </table>
         <button type="button" id="library_plus_btn">+</button>
         <input type="hidden" id="libraries" name="<?php echo $val['option_name']; ?>" value="<?php echo $data; ?>"/>

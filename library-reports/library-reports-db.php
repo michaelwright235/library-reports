@@ -40,24 +40,23 @@ class LibraryReportsDb {
         $library_reports_db = $wpdb->prefix . self::DB_NAME;  // table name
 
         // Проверка кода
-        if(!wp_verify_nonce($_POST['_wpnonce'], LibraryReportsFrontend::ACTION_NAME)) {
-            add_settings_error( 'library_reports_messages', 'library_reports_message', "Ошибка, попробуйте еще раз", 'error' );
-            settings_errors( 'library_reports_messages' );
-            exit();
-        }
+        if(!wp_verify_nonce($_POST['_wpnonce'], LibraryReportsFrontend::ACTION_NAME))
+            wp_send_json_error( 
+                LibraryReportsCommon::get_wp_notification("Ошибка, попробуйте еще раз")
+            );
 
         // Проверка отчета
-        if(($checkResult = self::check_report($_POST)) !== true) {
-            add_settings_error( 'library_reports_messages', 'library_reports_message', "Ошибка: $checkResult", 'error' );
-            settings_errors( 'library_reports_messages' );
-            exit();
-        }
+        if(($checkResult = self::check_report($_POST)) !== true)
+            wp_send_json_error( 
+                LibraryReportsCommon::get_wp_notification("Ошибка: $checkResult")
+            );
 
         $content = [];
         foreach(LibraryReportsCommon::FIELDS as $f => $v) {
             $content[$f] = $_POST[$f];
         }
 
+        $updating = false;
         // Если отчета еще не существует, то добавляем
         if( !self::report_exists($_POST['library'], $_POST['date']) ) {
             $insertion = array(
@@ -73,11 +72,10 @@ class LibraryReportsDb {
                 '%s'
             );
             $result = $wpdb->insert($library_reports_db, $insertion, $format);
-            if($result !== false)
-                add_settings_error( 'library_reports_messages', 'library_reports_message', 'Отчет успешно добавлен', 'updated' );
         }
         // Если отчет нужно обновить
         else {
+            $updating = true;
             $insertion = array(
                 'content' => json_encode($content)
             );
@@ -93,17 +91,19 @@ class LibraryReportsDb {
                 '%s'
             );
             $result = $wpdb->update($library_reports_db, $insertion, $where, $format, $formatWhere);
-            if($result !== false)
-                add_settings_error( 'library_reports_messages', 'library_reports_message', 'Отчет успешно обновлен', 'updated' );
         }
-
-        if($result === false) 
-            add_settings_error( 'library_reports_messages', 'library_reports_message', 'Ошибка запроса базы данных', 'error' );
         
         LibraryReportsCommon::sendReportViaMail($_POST); // Посылаем письмо на почту
-        settings_errors( 'library_reports_messages' );
 
-        exit();
+        if($result === false) 
+            wp_send_json_error( 
+                LibraryReportsCommon::get_wp_notification('Ошибка запроса базы данных')
+            );
+        else
+            wp_send_json_success( 
+                LibraryReportsCommon::get_wp_notification(
+                    (!$updating) ? 'Отчет успешно добавлен' : 'Отчет успешно обновлен', false)
+            );
     }
 
     /**
