@@ -168,7 +168,7 @@ jQuery(document).ready(function($) {
             data: $("#library-reports-report-form").serialize(),
             success: (response) => { 
                 document.querySelector("#resultsFor").innerHTML = response;
-                makeNoticesDismissible();
+                document.dispatchEvent(new Event("wp-updates-notice-added"));
                 window.scroll({
                     top: 0, 
                     left: 0, 
@@ -214,35 +214,4 @@ jQuery(document).ready(function($) {
             $("#"+val).val('');
         });
     }
-
-    /**
-	 * Makes notices dismissible.
-	 *
-	 * @since 4.4.0
-	 *
-	 * @return {void}
-	 */
-	function makeNoticesDismissible() {
-		$( '.notice.is-dismissible' ).each( function() {
-			var $el = $( this ),
-				$button = $( '<button type="button" class="notice-dismiss"><span class="screen-reader-text"></span></button>' );
-
-			if ( $el.find( '.notice-dismiss' ).length ) {
-				return;
-			}
-
-			// Ensure plain text.
-			$button.find( '.screen-reader-text' ).text( wp.i18n.__( 'Dismiss this notice.' ) );
-			$button.on( 'click.wp-dismiss-notice', function( event ) {
-				event.preventDefault();
-				$el.fadeTo( 100, 0, function() {
-					$el.slideUp( 100, function() {
-						$el.remove();
-					});
-				});
-			});
-
-			$el.append( $button );
-		});
-	}
 });
