@@ -95,9 +95,9 @@ class LibraryReportsExport {
     }
 
     public static function export_submitted() {
-        if(!wp_verify_nonce($_POST['_wpnonce'], self::EXPORT_ACTION)) {
-            exit();
-        }
+        if(!wp_verify_nonce($_POST['_wpnonce'], self::EXPORT_ACTION))
+            wp_send_json_error();
+
         $lib = $_POST['library'];
         if(!LibraryReportsCommon::is_library_available($lib)) exit();
         $whatToExport = $_POST['whatToExport'];
@@ -105,13 +105,12 @@ class LibraryReportsExport {
         // Экспорт одной даты
         if($whatToExport == 'exportSingleDate') {
             $date = DateTime::createFromFormat('Y-m-d', $_POST['singleDate']);
-            if(!$date) exit();
+            if(!$date) wp_send_json_error();
             $result = LibraryReportsDb::get_single_day_report(
                 $lib,
                 $date->format('Y-m-d')
             );
-            echo json_encode($result);
-            exit();
+            wp_send_json_success($result);
         }
 
         // Экспорт интервала дат
@@ -119,10 +118,8 @@ class LibraryReportsExport {
             $dateFrom = DateTime::createFromFormat('Y-m-d', $_POST['dateFrom']);
             $dateTo = DateTime::createFromFormat('Y-m-d', $_POST['dateTo']);
             $dateTo->modify('+1 day');
-            if(!$dateFrom || !$dateTo) {
-                return '{}';
-                exit();
-            }
+            if(!$dateFrom || !$dateTo)
+                wp_send_json_success();
 
             $reports = [];
             while($dateFrom->format('Y-m-d') != $dateTo->format('Y-m-d')) {
@@ -133,8 +130,8 @@ class LibraryReportsExport {
                 }
                 $dateFrom->modify('+1 day');
             }
-            echo json_encode($reports);
-            exit();
+            //if(count($result) == 1) $result = $result[0];
+            wp_send_json_success($reports);
         }
     }
 

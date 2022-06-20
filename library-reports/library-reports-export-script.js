@@ -39,18 +39,17 @@ jQuery(document).ready(function($) {
     });
 
     function processResponse(response) {
-        let jsonR = JSON.parse(response);
+        console.log(response);
         reportResults.innerHTML = "";
-        if (jsonR.length == 1) {
-            let r = jsonR[0];
-            if(r.content !== undefined) {
-                drawOneDayReport(r);
-            } else if(r[0] !== undefined) {
-                drawIntervalReport(jsonR);
+        if (response.data.length == 1) {
+            if(response.data[0].content !== undefined) {
+                drawOneDayReport(response.data[0]);
+            } else if(response.data[0][0] !== undefined) {
+                drawIntervalReport(response);
             }
         } 
-        else if (jsonR.length > 1) {
-            drawIntervalReport(jsonR);
+        else if (response.data.length > 1) {
+            drawIntervalReport(response);
         }
         else {
             reportResults.innerText = "Отчет не найден";
@@ -70,15 +69,16 @@ jQuery(document).ready(function($) {
     function drawIntervalReport(response) {
         let exportSeparatly = document.querySelector("#exportSeparatly").checked;
         if(exportSeparatly) {
-            for(let i = 0; i < response.length; i++) {
-                drawOneDayReport(response[i][0]);
+            for(let i = 0; i < response.data.length; i++) {
+                drawOneDayReport(response.data[i][0]);
             }
             return;
         }
 
-        let firstElementContent = JSON.parse(response[0][0].content);
+        let firstElementData = response.data[0][0];
+        let firstElementContent = JSON.parse(firstElementData.content);
 
-        let libraryId = response[0][0].library_id;
+        let libraryId = firstElementData.library_id;
         let dateFrom = document.querySelector("#datepickerFrom").value;
         let dateTo = document.querySelector("#datepickerTo").value;
         reportResults.innerHTML = "";
@@ -91,10 +91,11 @@ jQuery(document).ready(function($) {
         }
         // Суммируем числа, начиная со второго элемента
         let dates = [];
-        dates.push(response[0][0].report_date);
-        for(let i = 1; i < response.length; i++) {
-            let currentContent = JSON.parse(response[i][0].content);
-            dates.push(response[i][0].report_date);
+        dates.push(firstElementData.report_date);
+        for(let i = 1; i < response.data.length; i++) {
+            let currentData = response.data[i][0];
+            let currentContent = JSON.parse(currentData.content);
+            dates.push(currentData.report_date);
             for(let name in firstElementContent) {
                 firstElementContent[name] += parseInt(currentContent[name]);
             }
