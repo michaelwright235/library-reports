@@ -169,7 +169,7 @@ class LibraryReportsAddEvent {
         $meta_input = [];
         if ( count($thumbnailId) != 0 &&
              wp_get_attachment_image( $thumbnailId[0], 'thumbnail' ) ) {
-            $meta_input = ['_thumbnail_id' => $_POST['mainImageId']];
+            $meta_input = ['_thumbnail_id' => $thumbnailId[0]];
         } else {
             wp_send_json_error(
                 LibraryReportsCommon::get_wp_notification("Выберите главную фотографию")
@@ -177,7 +177,7 @@ class LibraryReportsAddEvent {
         }
 
         $restImages = explode(',', $_POST['restImagesIds']);
-        array_unshift($restImages, $thumbnailId);
+        array_unshift($restImages, $thumbnailId[0]);
         if(count($restImages) != 0) {
             $imagesHtml = '';
             $imagesId = [];
