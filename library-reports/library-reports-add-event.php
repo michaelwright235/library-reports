@@ -177,6 +177,7 @@ class LibraryReportsAddEvent {
         }
 
         $restImages = explode(',', $_POST['restImagesIds']);
+        array_unshift($restImages, $thumbnailId);
         if(count($restImages) != 0) {
             $imagesHtml = '';
             $imagesId = [];

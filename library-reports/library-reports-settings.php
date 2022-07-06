@@ -195,7 +195,7 @@ class LibraryReportsSettings {
                 <td>Категория</td>
             </tr>
         </table>
-        <button type="button" id="library_plus_btn">+</button>
+        <button type="button" id="library_plus_btn" class="button button-primary">+</button>
         <input type="hidden" id="libraries" name="<?php echo $val['option_name']; ?>" value="<?php echo $data; ?>"/>
         <?php
     }

@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const restImagesPreview = document.querySelector("div#restImagesPreview");
     const addEventBtn = document.querySelector("#addEventBtn");
 
-    jQuery("#datepicker").datepicker({dateFormat: "yy-mm-dd"});
+    jQuery("#datepicker").datepicker({dateFormat: "yy-mm-dd", maxDate: 0});
     
     /* Выбор главной фотографии */
     const selectMainImageFrame = wp.media({
