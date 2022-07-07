@@ -106,9 +106,12 @@ document.addEventListener("DOMContentLoaded", () => {
         e.preventDefault();
         window.tinyMCE.triggerSave();
         addEventBtn.disabled = true;
+        const editorBody = window.tinyMCE.get('eventDescription').getContent();
+        let body = new FormData(e.currentTarget);
+        body.set('eventDescription', editorBody);
         fetch(ajaxurl, {
             method: "POST",
-            body: new FormData(e.currentTarget)
+            body: body
         })
         .then((response) => {
             if(response.ok)
