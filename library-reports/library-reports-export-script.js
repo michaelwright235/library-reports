@@ -19,7 +19,7 @@ jQuery(document).ready(function($) {
             date = jQuery.datepicker.parseDate( "yy-mm-dd", element.value );
         } catch( error ) {
             date = null;
-            console.log(error);
+            console.log("Произошла ошибка парсинга даты: " + error);
         }
         return date;
     }
@@ -33,13 +33,12 @@ jQuery(document).ready(function($) {
             data: $("#library-reports-export-form").serialize(),
             success: (response) => { processResponse(response); },
             error: function(response) {
-                console.log(response);
+                console.log("Произошла ошибка при выгрузке данных: " + response);
             }
         });
     });
 
     function processResponse(response) {
-        console.log(response);
         reportResults.innerHTML = "";
         if (response.data.length == 1) {
             if(response.data[0].content !== undefined) {

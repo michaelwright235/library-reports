@@ -174,10 +174,9 @@ jQuery(document).ready(function($) {
                     left: 0, 
                     behavior: 'smooth' 
                 });
-                console.log(response);
              },
             error: function(response) {
-                console.log(response);
+                console.log("Произошла ошибка при отправке формы: " + response);
             },
         });
     });
@@ -195,13 +194,12 @@ jQuery(document).ready(function($) {
                 putCompletedReport(JSON.parse(response.data[0].content));
             },
             error: function(response) {
-                console.log(response);
+                console.log("Произошла ошибка при получении отчета: " + response);
             },
         });
     }
 
     function putCompletedReport(content) {
-        console.log(content);
         for(let name in content) {
             $("#"+name).val(content[name]);
         }
