@@ -75,34 +75,33 @@ jQuery(document).ready(function($) {
             return;
         }
 
-        let firstElementData = response.data[0][0];
-        let firstElementContent = JSON.parse(firstElementData.content);
+        let contents = JSON.parse(JSON.stringify(LIBRARY_REPORTS_FIELD_NAMES)); // clone
+        for(key in contents) {
+            contents[key] = 0;
+        }
 
-        let libraryId = firstElementData.library_id;
+        let libraryId = response.data[0][0].library_id;
         let dateFrom = document.querySelector("#datepickerFrom").value;
         let dateTo = document.querySelector("#datepickerTo").value;
         reportResults.innerHTML = "";
         reportResults.innerHTML += "<h2>"+getLibraryName(libraryId)+"</h2>";
         reportResults.innerHTML += "<h3>Дата: с "+escapeHtml(dateFrom)+" по "+escapeHtml(dateTo)+"</h3>";
 
-        // Преобразуем в числа, чтобы суммировать
-        for(let name in firstElementContent) {
-            firstElementContent[name] = parseInt(firstElementContent[name]);
-        }
-        // Суммируем числа, начиная со второго элемента
         let dates = [];
-        dates.push(firstElementData.report_date);
-        for(let i = 1; i < response.data.length; i++) {
+        // Суммируем все строки
+        for(let i = 0; i < response.data.length; i++) {
             let currentData = response.data[i][0];
             let currentContent = JSON.parse(currentData.content);
             dates.push(currentData.report_date);
-            for(let name in firstElementContent) {
-                firstElementContent[name] += parseInt(currentContent[name]);
+            for(let name in contents) {
+                if(currentContent[name]) { // проверка на то, если в данном отчете это поле
+                    contents[name] += parseInt(currentContent[name]);
+                }
             }
         }
         reportResults.innerHTML += "<h4>"+dates.join(', ')+"</h4>";
-        writeAdditionalRows(firstElementContent);
-        drawTable(firstElementContent);
+        writeAdditionalRows(contents);
+        drawTable(contents);
     }
 
     function writeAdditionalRows(content) {
@@ -136,11 +135,21 @@ jQuery(document).ready(function($) {
         html += '<p><a href="javascript:window.print();" id="reportPrint"><span class="dashicons dashicons-printer"></span></a></p>';
 
         html += "<table class='library_export_result'>";
-        for(let name in content) {
-            html += "<tr>";
-            html += "<th>" + LIBRARY_REPORTS_FIELD_NAMES[name] + "</th>";
-            html += "<td>" + escapeHtml(content[name]) + "</td>";
-            html += "</tr>";
+        for(let name in LIBRARY_REPORTS_FIELD_NAMES) {
+            if(content.hasOwnProperty(name)) {
+                html += "<tr>";
+                html += "<th>" + LIBRARY_REPORTS_FIELD_NAMES[name] + "</th>";
+                html += "<td>" + escapeHtml(content[name]) + "</td>";
+                html += "</tr>";
+            }
+        }
+        for(let name in LIBRARY_REPORTS_ADDITIONAL_FIELD_NAMES) {
+            if(content.hasOwnProperty(name)) {
+                html += "<tr>";
+                html += "<th>" + LIBRARY_REPORTS_ADDITIONAL_FIELD_NAMES[name] + "</th>";
+                html += "<td>" + escapeHtml(content[name]) + "</td>";
+                html += "</tr>";
+            }
         }
         html += '</table>'
         reportResults.innerHTML += html;
