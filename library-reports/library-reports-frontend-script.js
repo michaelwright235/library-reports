@@ -208,7 +208,7 @@ jQuery(document).ready(function($) {
     }
 
     function clearForm() {
-        let toClear = ['tBookPeople', 'booksOut', 'booksIn', 'tEvntIn', 'tPplIn14', 'tPplIn1530', 'tPplIn30', 'tPplInFree', 'tPplInPaid', 'tPplOut', 'tPplOut14', 'tPplOut1530', 'tPplOut30', 'tPplOutFree', 'tPplOutPaid', 'tIncome', 'ecb'];
+        let toClear = ['tBookPeople', 'booksOut', 'booksIn', 'tEvntIn', 'tPplIn14', 'tPplIn1530', 'tPplIn30', 'tPplInFree', 'tPplInPaid', 'tPplOut', 'tPplOut14', 'tPplOut1530', 'tPplOut30', 'tPplOutFree', 'tPplOutPaid', 'tIncome', 'ecb', 'tRegPplWithAgreement'];
         toClear.forEach((val) => {
             $("#"+val).val('');
         });

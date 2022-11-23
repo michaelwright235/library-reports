@@ -34,7 +34,8 @@ class LibraryReportsFrontend {
             LibraryReportsCommon::get_label_for('tPplOutPaid') => self::create_numeric_input('tPplOutPaid') . '<br><p id="sumStatusOutside"></p>',
             '<h2>---</h2>' => '',
             LibraryReportsCommon::get_label_for('tIncome') => self::create_numeric_input('tIncome'),
-            LibraryReportsCommon::get_label_for('ecb') => self::create_numeric_input('ecb')
+            LibraryReportsCommon::get_label_for('ecb') => self::create_numeric_input('ecb'),
+            LibraryReportsCommon::get_label_for('tRegPplWithAgreement') => self::create_numeric_input('tRegPplWithAgreement')
         ];
 
         ?>
