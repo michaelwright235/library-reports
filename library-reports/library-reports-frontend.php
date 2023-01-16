@@ -10,34 +10,6 @@ class LibraryReportsFrontend {
     }
 
     public static function draw_page() {
-        $fields = [
-            LibraryReportsCommon::LIBRARY_INPUT_DESC => LibraryReportsCommon::create_library_select_input('library'),
-            LibraryReportsCommon::LIBRARY_DATE_DESC => '<input type="text" autocomplete="off" id="datepicker" readonly name="date">',
-            LibraryReportsCommon::get_label_for('tBookPeople') => self::create_numeric_input('tBookPeople'),
-            LibraryReportsCommon::get_label_for('booksOut') => self::create_numeric_input('booksOut'),
-            LibraryReportsCommon::get_label_for('booksIn') => self::create_numeric_input('booksIn'),
-            '<h2>Мероприятия в стационаре</h2>' => '',
-            LibraryReportsCommon::get_label_for('tEvntIn') => self::create_numeric_input('tEvntIn'),
-            LibraryReportsCommon::get_label_for('tPplIn14') => self::create_numeric_input('tPplIn14'),
-            LibraryReportsCommon::get_label_for('tPplIn1530') => self::create_numeric_input('tPplIn1530'),
-            LibraryReportsCommon::get_label_for('tPplIn30') => self::create_numeric_input('tPplIn30'),
-            '<strong>Важно! "до 14 лет" + "15-30 лет" + "старше 30 лет" = "бесплатно" + "платно"</strong>' => '',
-            LibraryReportsCommon::get_label_for('tPplInFree') => self::create_numeric_input('tPplInFree'),
-            LibraryReportsCommon::get_label_for('tPplInPaid') => self::create_numeric_input('tPplInPaid') . '<br><p id="sumStatusInside"></p>',
-            '<h2>Мероприятия вне стационара</h2>' => '',
-            LibraryReportsCommon::get_label_for('tPplOut') => self::create_numeric_input('tPplOut'),
-            LibraryReportsCommon::get_label_for('tPplOut14') => self::create_numeric_input('tPplOut14'),
-            LibraryReportsCommon::get_label_for('tPplOut1530') => self::create_numeric_input('tPplOut1530'),
-            LibraryReportsCommon::get_label_for('tPplOut30') => self::create_numeric_input('tPplOut30'),
-            '<strong>Важно! "до 14 лет" + "15-30 лет" + "старше 30 лет" = "бесплатно" + "платно"</strong> ' => '',
-            LibraryReportsCommon::get_label_for('tPplOutFree') => self::create_numeric_input('tPplOutFree'),
-            LibraryReportsCommon::get_label_for('tPplOutPaid') => self::create_numeric_input('tPplOutPaid') . '<br><p id="sumStatusOutside"></p>',
-            '<h2>---</h2>' => '',
-            LibraryReportsCommon::get_label_for('tIncome') => self::create_numeric_input('tIncome'),
-            LibraryReportsCommon::get_label_for('ecb') => self::create_numeric_input('ecb'),
-            LibraryReportsCommon::get_label_for('tRegPplWithAgreement') => self::create_numeric_input('tRegPplWithAgreement')
-        ];
-
         ?>
         <style>
         @media print {
@@ -97,10 +69,13 @@ class LibraryReportsFrontend {
             <a href="javascript:window.print();" id="reportPrint"><span class="dashicons dashicons-printer"></span></a>
             <form action="<?php echo admin_url( 'admin.php' ); ?>" method="post" id="library-reports-report-form">
                 <table class="library-report-table form-table" role="presentation">
-                    <?php foreach($fields as $name => $html) {?>
+                    <?php 
+                    $fields = ReportField::array_to_fields(LibraryReportsCommon::FIELDS);
+                    foreach($fields as $field) {
+                        ?>
                     <tr>
-                        <th scope="row"><?php echo $name; ?></th>
-                        <td><?php echo $html; ?></td>
+                        <th scope="row"><?php echo $field->get_field_name(); ?></th>
+                        <td><?php echo $field->get_field_value(); ?></td>
                     </tr>
                     <?php } ?>
                 </table>

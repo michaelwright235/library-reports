@@ -1,30 +1,179 @@
 <?php
-class LibraryReportsCommon {
-    const LIBRARY_INPUT_DESC = 'Библиотека';
-    const LIBRARY_DATE_DESC = 'Дата';
+
+/**
+ * Перечисление типов полей отчета
+ */
+enum ReportFieldType {
     /**
-     * @var array Поля отчета в формате $name => $description.
+     * Отображается только название поля слева в таблице (заглушка)
      */
-    const FIELDS = array(
-        'tBookPeople' => 'Число посещений для получения библиотечно-информационных услуг',
-        'booksOut' => 'Количество выданной литературы',
-        'booksIn' => 'Количество сданной литературы',
-        'tEvntIn' => 'Количество мероприятий в стационаре',
-        'tPplIn14' => 'Посетили мероприятия в стационаре до 14 лет',
-        'tPplIn1530' => 'Посетили мероприятия в стационаре 15-30 лет',
-        'tPplIn30' => 'Посетили мероприятия в стационаре старше 30 лет',
-        'tPplInFree' => 'Посетили мероприятия в стационаре бесплатно',
-        'tPplInPaid' => 'Посетили мероприятия в стационаре платно',
-        'tPplOut' => 'Количество мероприятий вне стационара',
-        'tPplOut14' => 'Посетили мероприятия вне стационара до 14 лет',
-        'tPplOut1530' => 'Посетили мероприятия вне стационара 15-30 лет',
-        'tPplOut30' => 'Посетили мероприятия вне стационара старше 30 лет',
-        'tPplOutFree' => 'Посетили мероприятия вне стационара бесплатно',
-        'tPplOutPaid' => 'Посетили мероприятия вне стационара платно',
-        'tIncome' => 'Общий объем доходов от оказания платных услуг',
-        'ecb' => 'ЭЧБ',
-        'tRegPplWithAgreement' => 'Количество заполненных соглашений об обработке персональных данных'
-    );
+    case FieldNameOnly;
+    /**
+     * Отображается только значение поля справа в таблице (заглушка)
+     */
+    case FieldValueOnly;
+    /**
+     * Числовое поле: type="text" autocomplete="off" inputmode="numeric"
+     */
+    case Numeric;
+    /**
+     * Поле для ввода даты через DatePicker (jQuery)
+     */
+    case Date;
+    /**
+     * Список библиотек
+     */
+    case Library;
+}
+
+/**
+ * Класс для одного поля отчета
+ */
+class ReportField {
+    private string $name, $desc;
+    private ReportFieldType $type;
+
+    public function __construct(string $name, string $desc, ReportFieldType $type) {
+        $this->name = $name;
+        $this->desc = $desc;
+        $this->type = $type;
+    }
+
+    /**
+     * Создает \<label\> для текущего поля
+     *
+     * @return string
+     */
+    private function get_label() : string { 
+        return sprintf('<label for="%s">%s</label>', $this->name, $this->desc);
+    }
+
+    /**
+     * Создает числовое поле inputmode="numeric"
+     *
+     * @return string
+     */
+    private function get_numeric_input() : string {
+        return sprintf('<input type="text" autocomplete="off" inputmode="numeric" name="%1$s" id="%1$s">', $this->name);
+    }
+
+    /**
+     * Создает поле ввода даты через DatePicker jQuery
+     *
+     * @return string
+     */
+    private function get_date_input() : string {
+        return sprintf('<input type="text" autocomplete="off" id="datepicker" readonly name="%s">', $this->name);
+    }
+
+    /**
+     * Смотрите LibraryReportsCommon::create_library_select_input
+     *
+     * @return string
+     */
+    private function get_library_select_input() : string {
+        return LibraryReportsCommon::create_library_select_input($this->name);
+    }
+
+    /**
+     * Возвращает название поля в виде \<label\>.
+     * В случае FieldNameOnly выводится $desc, FieldValueOnly - пустая строка.
+     *
+     * @return string
+     */
+    public function get_field_name() : string {
+        if ($this->type == ReportFieldType::FieldNameOnly)
+            return $this->desc;
+        if ($this->type == ReportFieldType::FieldValueOnly)
+            return '';
+        return self::get_label();
+    }
+
+    /**
+     * Возвращает \<input\> в соответствие с указанным типом поля.
+     * В случае FieldNameOnly - пустая строка, FieldValueOnly - $desc, 
+     *
+     * @return string
+     */
+    public function get_field_value() : string {
+        $html = '';
+        switch($this->type) {
+            case ReportFieldType::Numeric:
+                $html = self::get_numeric_input();
+                break;
+            case ReportFieldType::Library:
+                $html = self::get_library_select_input();
+                break;
+            case ReportFieldType::Date:
+                $html = self::get_date_input();
+                break;
+            case ReportFieldType::FieldValueOnly:
+                $html = $this->desc;
+                break;
+        }
+        return $html;
+    }
+
+    public static function array_to_fields(array $arr) : array {
+        $fields = [];
+        foreach($arr as $f) {
+            array_push($fields, new self($f[0], $f[1], $f[2]));
+        }
+        return $fields;
+    }
+}
+
+/**
+ * Класс общих для других функций и констант
+ */
+class LibraryReportsCommon {
+    /**
+     * @var array<string,string,ReportFieldType> Поля отчета в формате [$name, $description, $type : ReportFieldType].
+     */
+    const FIELDS = [
+        ['library', 'Библиотека', ReportFieldType::Library],
+        ['date', 'Дата', ReportFieldType::Date],
+        ['tBookPeople','Число посещений для получения библиотечно-информационных услуг', ReportFieldType::Numeric],
+        ['booksOut','Количество выданной литературы', ReportFieldType::Numeric],
+        ['booksIn','Количество сданной литературы', ReportFieldType::Numeric],
+        ['', '<h2>Мероприятия в стационаре</h2>', ReportFieldType::FieldNameOnly],
+        ['tEvntIn','Количество мероприятий в стационаре', ReportFieldType::Numeric],
+        ['tPplIn14','Посетили мероприятия в стационаре до 14 лет', ReportFieldType::Numeric],
+        ['tPplIn1530','Посетили мероприятия в стационаре 15-30 лет', ReportFieldType::Numeric],
+        ['tPplIn30','Посетили мероприятия в стационаре старше 30 лет', ReportFieldType::Numeric],
+        ['', '<strong>Важно! "до 14 лет" + "15-30 лет" + "старше 30 лет" = "бесплатно" + "платно"</strong>', ReportFieldType::FieldNameOnly],
+        ['tPplInFree','Посетили мероприятия в стационаре бесплатно', ReportFieldType::Numeric],
+        ['tPplInPaid','Посетили мероприятия в стационаре платно', ReportFieldType::Numeric],
+        ['', '<p id="sumStatusInside"></p>', ReportFieldType::FieldValueOnly],
+        ['', '<h2>Мероприятия вне стационара</h2>', ReportFieldType::FieldNameOnly],
+        ['tPplOut','Количество мероприятий вне стационара', ReportFieldType::Numeric],
+        ['tPplOut14','Посетили мероприятия вне стационара до 14 лет', ReportFieldType::Numeric],
+        ['tPplOut1530','Посетили мероприятия вне стационара 15-30 лет', ReportFieldType::Numeric],
+        ['tPplOut30','Посетили мероприятия вне стационара старше 30 лет', ReportFieldType::Numeric],
+        ['', '<strong>Важно! "до 14 лет" + "15-30 лет" + "старше 30 лет" = "бесплатно" + "платно"</strong>', ReportFieldType::FieldNameOnly],
+        ['tPplOutFree','Посетили мероприятия вне стационара бесплатно', ReportFieldType::Numeric],
+        ['tPplOutPaid','Посетили мероприятия вне стационара платно', ReportFieldType::Numeric],
+        ['', '<p id="sumStatusOutside"></p>', ReportFieldType::FieldValueOnly],
+        ['', '<h2>---</h2>', ReportFieldType::FieldNameOnly],
+        ['tIncome','Общий объем доходов от оказания платных услуг', ReportFieldType::Numeric],
+        ['ecb','ЭЧБ', ReportFieldType::Numeric],
+        ['tRegPplWithAgreement','Количество заполненных соглашений об обработке персональных данных', ReportFieldType::Numeric],
+    ];
+
+    /**
+     * Возвращает все поля, кроме пустых заглушек, полей даты и библиотеки.
+     *
+     * @return array<string,string,ReportFieldType>
+     */
+    public static function get_valueble_fields() : array{
+        $fields = [];
+        foreach(self::FIELDS as $f) {
+            if ($f[0] == '' || $f[0] == 'date' || $f[0] == 'library')
+                continue;
+            array_push($fields, $f);
+        }
+        return $fields;
+    }
 
     /**
      * Получение всех доступных библиотек для текущего пользователя
@@ -109,16 +258,11 @@ class LibraryReportsCommon {
     }
 
     /**
-     * Создать HTML-элемент \<label\> для поля с данным именем
-     * из массива FIELDS
+     * Отправляет на e-mail пользователя отправленный отчет
      *
-     * @param string $name Название поля
-     * @return string
+     * @param array $report
+     * @return void
      */
-    public static function get_label_for(string $name) : string { 
-        return sprintf('<label for="%s">%s</label>', $name, self::FIELDS[$name]);
-    }
-
     public static function sendReportViaMail($report) {
         if(current_user_can( 'manage_options' )) {
             return;
@@ -136,8 +280,8 @@ class LibraryReportsCommon {
         $content .= '<table border="1" bordercolor="#858585" cellspacing="0">';
 
         $fields = [];
-        foreach(LibraryReportsCommon::FIELDS as $f => $v) {
-            $fields[$f] = $report[$f];
+        foreach(LibraryReportsCommon::get_valueble_fields() as $f) {
+            $fields[$f[0]] = $report[$f[0]];
         }
         foreach($fields as $f => $v) {
             $content .= "<tr>";
@@ -157,6 +301,13 @@ class LibraryReportsCommon {
         wp_mail( $email, $subject, $content );
     }
 
+    /**
+     * Возвращает HTML версию уведомления WordPress
+     *
+     * @param string $text Текст для вывода
+     * @param boolean $isError Если ошибка, то будет красное уведомление, если нет - зеленое
+     * @return string HTML уведомления
+     */
     public static function get_wp_notification(string $text, bool $isError = true) : string {
         ob_start();
         $type = $isError ? 'error' : 'updated';

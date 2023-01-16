@@ -52,8 +52,8 @@ class LibraryReportsDb {
             );
 
         $content = [];
-        foreach(LibraryReportsCommon::FIELDS as $f => $v) {
-            $content[$f] = $_POST[$f];
+        foreach(LibraryReportsCommon::get_valueble_fields() as $f) {
+            $content[$f[0]] = $_POST[$f[0]];
         }
 
         $updating = false;
@@ -173,8 +173,8 @@ class LibraryReportsDb {
 
         // Проверка полей число >0 
         $toVerify = [];
-        foreach(LibraryReportsCommon::FIELDS as $f => $v) {
-            $toVerify[] = $report[$f];
+        foreach(LibraryReportsCommon::get_valueble_fields() as $f) {
+            $toVerify[] = $report[$f[0]];
         }
         foreach($toVerify as $f) {
             if(preg_match("/^\d+$/", $f) !== 1) {

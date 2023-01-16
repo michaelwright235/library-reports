@@ -18,9 +18,9 @@ class LibraryReportsExport {
         <script>
             var LIBRARY_REPORTS_FIELD_NAMES = {};
             <?php
-                    foreach(LibraryReportsCommon::FIELDS as $name => $desc) {
-                        $desc = esc_html($desc);
-                        echo "LIBRARY_REPORTS_FIELD_NAMES['$name'] = '$desc';\n";
+                    foreach(LibraryReportsCommon::get_valueble_fields() as $field) {
+                        $desc = esc_html($field[1]);
+                        echo "LIBRARY_REPORTS_FIELD_NAMES['$field[0]'] = '$desc';\n";
                     }
             ?>
             var LIBRARY_REPORTS_ADDITIONAL_FIELD_NAMES = {};
