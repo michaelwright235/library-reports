@@ -89,11 +89,7 @@ class LibraryReportsFrontend {
         </div>
         <?php
     } 
-
-    public static function create_numeric_input($name) {
-        return sprintf('<input type="text" autocomplete="off" inputmode="numeric" name="%1$s" id="%1$s">', $name);
-    }
-
+    
     public static function ajax_get_single_report() {
         if(!wp_verify_nonce($_POST['_wpnonce'], self::ACTION_NAME) ||
             !LibraryReportsCommon::is_library_available($_POST['library']) ||
