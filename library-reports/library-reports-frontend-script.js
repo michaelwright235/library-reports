@@ -83,6 +83,7 @@ jQuery(document).ready(function($) {
         return result;
     }
 
+    /*
     // Проверка сумм в стационаре
     let in1 = document.querySelector("input[name=tPplIn14]");
     let in2 = document.querySelector("input[name=tPplIn1530]");
@@ -127,6 +128,7 @@ jQuery(document).ready(function($) {
             return true;
         }
     }
+    */
 
     function isWrongInput(...inputs) {
         let result = false;
@@ -155,11 +157,11 @@ jQuery(document).ready(function($) {
             statusP.innerText = "Одно из полей не заполнено";
             return;
         }
-        if(!checkSum(in1, in2, in3, in4, in5, statusInside) ||
+        /*if(!checkSum(in1, in2, in3, in4, in5, statusInside) ||
             !checkSum(out1, out2, out3, out4, out5, statusOutside)) {
             statusP.innerText = "Проверьте сумму людей";
             return;
-        }
+        }*/
         statusP.innerText = "";
 
         $.ajax({
