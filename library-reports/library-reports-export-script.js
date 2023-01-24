@@ -137,7 +137,7 @@ jQuery(document).ready(function($) {
             content.tPplOut;
         content["totalRegUsers"] =
             content.regs14 +
-            content.regs1530
+            content.regs1530 +
             content.regs30;
     }
 
