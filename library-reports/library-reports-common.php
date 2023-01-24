@@ -280,8 +280,15 @@ class LibraryReportsCommon {
             $fields[$f[0]] = $report[$f[0]];
         }
         foreach($fields as $f => $v) {
+            $fname = '';
+            // Поиск названия поля
+            foreach(LibraryReportsCommon::FIELDS as $a) {
+                if($a[0] == $f) {
+                    $fname = $a[1];
+                }
+            }
             $content .= "<tr>";
-            $content .= '<th style="text-align:left;">' . LibraryReportsCommon::FIELDS[$f] . "</th>";
+            $content .= '<th style="text-align:left;">' . $fname . "</th>";
             $content .= '<td style="text-align:left;">' . $v . '</td>';
             $content .= "</tr>";
         }
