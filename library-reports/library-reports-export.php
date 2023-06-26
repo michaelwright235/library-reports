@@ -23,10 +23,6 @@ class LibraryReportsExport {
                         echo "LIBRARY_REPORTS_FIELD_NAMES['$field[0]'] = '$desc';\n";
                     }
             ?>
-            var LIBRARY_REPORTS_ADDITIONAL_FIELD_NAMES = {};
-            LIBRARY_REPORTS_ADDITIONAL_FIELD_NAMES['totalUsers'] = '<i>Общее количество пользователей</i>';
-            LIBRARY_REPORTS_ADDITIONAL_FIELD_NAMES['totalFreeUsers'] = '<i>Общее на безвозмездной основе</i>';
-            LIBRARY_REPORTS_ADDITIONAL_FIELD_NAMES['totalEvents'] = '<i>Общее количество мероприятий</i>';
             var LIBRARY_REPORTS_LIBS = <?php echo get_option(LibraryReportsSettings::SETTINGS_OPT_LIBRARIES);?>;
         </script>
         <style>

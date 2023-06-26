@@ -1,3 +1,11 @@
+var LIBRARY_REPORTS_ADDITIONAL_FIELD_NAMES = {};
+LIBRARY_REPORTS_ADDITIONAL_FIELD_NAMES['totalBooksOut'] = '<i>Общее кол-во выданной литературы</i>';
+LIBRARY_REPORTS_ADDITIONAL_FIELD_NAMES['totalUsers'] = '<i>Общее кол-во пользователей</i>';
+LIBRARY_REPORTS_ADDITIONAL_FIELD_NAMES['totalFreeUsers'] = '<i>Общее кол-во пользователей на безвозмездной основе</i>';
+LIBRARY_REPORTS_ADDITIONAL_FIELD_NAMES['totalEventsIn'] = '<i>Общее кол-во мероприятий в стационаре</i>';
+LIBRARY_REPORTS_ADDITIONAL_FIELD_NAMES['totalEvents'] = '<i>Общее кол-во мероприятий</i>';
+LIBRARY_REPORTS_ADDITIONAL_FIELD_NAMES['totalRegUsers'] = '<i>Общее кол-во зарегистрированных пользователей</i>';
+
 jQuery(document).ready(function($) {
     const reportResults = document.querySelector("#reportResults");
     // Настройка полей дат
@@ -104,6 +112,10 @@ jQuery(document).ready(function($) {
     }
 
     function writeAdditionalRows(content) {
+        content["totalBooksOut"] =
+            content.booksOut14 +
+            content.booksOut1530 +
+            content.booksOut30;
         content["totalUsers"] =
             content.tBookPeople +
             content.tPplInFree + 
@@ -114,9 +126,19 @@ jQuery(document).ready(function($) {
             content.tBookPeople +
             content.tPplInFree +
             content.tPplOutFree;
+        content["totalEventsIn"] =
+            content.tEvntInFor14 +
+            content.tEvntInFor1530 +
+            content.tEvntInFor30;
         content["totalEvents"] =
-            content.tEvntIn +
+            content.tEvntInFor14 +
+            content.tEvntInFor1530 +
+            content.tEvntInFor30 +
             content.tPplOut;
+        content["totalRegUsers"] =
+            content.regs14 +
+            content.regs1530 +
+            content.regs30;
     }
 
     function getLibraryName(libraryId) {

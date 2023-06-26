@@ -183,7 +183,7 @@ class LibraryReportsDb {
         }
 
         // Проверка суммы
-        $sum1 = intval($report['tPplIn14']) +
+        /*$sum1 = intval($report['tPplIn14']) +
                 intval($report['tPplIn1530']) +
                 intval($report['tPplIn30']);
         $sum2 = intval($report['tPplInFree']) +
@@ -195,7 +195,7 @@ class LibraryReportsDb {
                 intval($report['tPplOut30']);
         $sum4 = intval($report['tPplOutFree']) +
                 intval($report['tPplOutPaid']);
-        if($sum3 !== $sum4) return "Ошибка суммы вне стационара";
+        if($sum3 !== $sum4) return "Ошибка суммы вне стационара";*/
 
         return true;
     }
