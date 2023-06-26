@@ -4,7 +4,7 @@
 Plugin Name: Library Reports
 Plugin URI: https://github.com/michaelwright235/library-reports
 Description: Ежедневная отчетность для библиотек
-Version: 1.2
+Version: 1.3
 Author: Michael Wright
 Author URI: https://github.com/michaelwright235
 License: MIT license
