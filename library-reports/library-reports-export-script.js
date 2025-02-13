@@ -107,38 +107,43 @@ jQuery(document).ready(function ($) {
             }
         }
         reportResults.innerHTML += "<h4>" + dates.join(', ') + "</h4>";
-        writeAdditionalRows(contents);
         drawTable(contents);
+        drawTable(writeAdditionalRows(contents));
+        document.querySelector("#wrap2").scrollIntoView({
+            behavior: 'smooth'
+        });
     }
 
     function writeAdditionalRows(content) {
-        content["totalBooksOut"] =
+        let new_table = [];
+        new_table["totalBooksOut"] =
             content.booksOut14 +
             content.booksOut1530 +
             content.booksOut30;
-        content["totalUsers"] =
+        new_table["totalUsers"] =
             content.tBookPeople +
             content.tPplInFree +
             content.tPplInPaid +
             content.tPplOutFree +
             content.tPplOutPaid;
-        content["totalFreeUsers"] =
+        new_table["totalFreeUsers"] =
             content.tBookPeople +
             content.tPplInFree +
             content.tPplOutFree;
-        content["totalEventsIn"] =
+        new_table["totalEventsIn"] =
             content.tEvntInFor14 +
             content.tEvntInFor1530 +
             content.tEvntInFor30;
-        content["totalEvents"] =
+        new_table["totalEvents"] =
             content.tEvntInFor14 +
             content.tEvntInFor1530 +
             content.tEvntInFor30 +
             content.tPplOut;
-        content["totalRegUsers"] =
+        new_table["totalRegUsers"] =
             content.regs14 +
             content.regs1530 +
             content.regs30;
+        return new_table;
     }
 
     function getLibraryName(libraryId) {
@@ -174,10 +179,6 @@ jQuery(document).ready(function ($) {
         }
         html += '</table>'
         reportResults.innerHTML += html;
-
-        document.querySelector("#wrap2").scrollIntoView({
-            behavior: 'smooth'
-        });
     }
 
     function escapeHtml(unsafe) {
