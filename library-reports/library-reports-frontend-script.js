@@ -1,36 +1,36 @@
-jQuery(document).ready(function($) {
+jQuery(document).ready(function ($) {
 
     // Создание календаря datepicker
     let date = new Date();
-    let month = date.getMonth()+1;
-    if(month < 10) month = "0" + month;
+    let month = date.getMonth() + 1;
+    if (month < 10) month = "0" + month;
     let day = date.getDate();
-    if(day < 10) day = "0" + day;
+    if (day < 10) day = "0" + day;
     let datepickerParams = {
         minDate: library_reports_edit_time,
         maxDate: library_reports_max_date,
         defaultDate: 0,
         dateFormat: "yy-mm-dd",
         beforeShowDay: function (date) {
-            if(dayHasReport(getFormattedDate(date))) {
+            if (dayHasReport(getFormattedDate(date))) {
                 return [true, 'dayHasReport'];
             } else {
                 return [true, ''];
             }
         },
         onSelect: (date) => {
-            if(dayHasReport(date)) {
+            if (dayHasReport(date)) {
                 getSingleReport(date);
             } else {
                 clearForm();
             }
         }
     };
-    
-    $( "#datepicker" ).datepicker(datepickerParams);
-    document.querySelector("#library").addEventListener('change',() => {
-        $( "#datepicker" ).datepicker(datepickerParams);
-        if( dayHasReport( document.querySelector("#datepicker").value ) ) {
+
+    $("#datepicker").datepicker(datepickerParams);
+    document.querySelector("#library").addEventListener('change', () => {
+        $("#datepicker").datepicker(datepickerParams);
+        if (dayHasReport(document.querySelector("#datepicker").value)) {
             getSingleReport(document.querySelector("#datepicker").value);
         } else {
             clearForm();
@@ -39,14 +39,14 @@ jQuery(document).ready(function($) {
 
     // Ставим сегодняшнюю дату
     let currentDate = getFormattedDate(new Date());
-    $( "#datepicker" ).val(currentDate);
-    if(dayHasReport(currentDate)) {
+    $("#datepicker").val(currentDate);
+    if (dayHasReport(currentDate)) {
         getSingleReport(currentDate);
     }
 
     function dayHasReport(date) {
         let currentLib = document.querySelector("#library").value;
-        if(library_reports_completed_reports[currentLib].includes(date) )
+        if (library_reports_completed_reports[currentLib].includes(date))
             return true;
         return false;
     }
@@ -56,7 +56,7 @@ jQuery(document).ready(function($) {
     inputs.forEach(element => {
         element.addEventListener('change', (event) => {
             let val = event.target.value;
-            if(!/^\d+$/.test(val)) {
+            if (!/^\d+$/.test(val)) {
                 event.target.classList.add('wrong-value');
             } else {
                 event.target.classList.remove('wrong-value');
@@ -66,10 +66,10 @@ jQuery(document).ready(function($) {
 
     // Получить дату в формату Y-m-d
     function getFormattedDate(date) {
-        let month = date.getMonth()+1;
-        if(month < 10) month = '0' + month;
+        let month = date.getMonth() + 1;
+        if (month < 10) month = '0' + month;
         let day = date.getDate();
-        if(day < 10) day = '0' + day;
+        if (day < 10) day = '0' + day;
         let d = date.getFullYear() + '-' + month + '-' + day;
         return d;
     }
@@ -78,7 +78,7 @@ jQuery(document).ready(function($) {
     function checkIfEmpty() {
         let result = false;
         inputs.forEach(element => {
-            if(element.value == "" || element.value == null) result = true;
+            if (element.value == "" || element.value == null) result = true;
         });
         return result;
     }
@@ -133,9 +133,9 @@ jQuery(document).ready(function($) {
     function isWrongInput(...inputs) {
         let result = false;
         inputs.forEach(el => {
-            if(el.classList.contains("wrong-value") ||
-            el.value == "" ||
-            el.value == null) {
+            if (el.classList.contains("wrong-value") ||
+                el.value == "" ||
+                el.value == null) {
                 result = true;
                 return;
             }
@@ -148,12 +148,12 @@ jQuery(document).ready(function($) {
     let statusP = document.getElementById("library-reports-form-status");
     form.addEventListener('submit', (event) => {
         event.preventDefault();
-        
-        if(form.querySelectorAll("input.wrong-value").length > 0) {
+
+        if (form.querySelectorAll("input.wrong-value").length > 0) {
             statusP.innerText = "Проверьте форму";
             return;
         }
-        if(checkIfEmpty()) {
+        if (checkIfEmpty()) {
             statusP.innerText = "Одно из полей не заполнено";
             return;
         }
@@ -165,52 +165,52 @@ jQuery(document).ready(function($) {
         statusP.innerText = "";
 
         $.ajax({
-            url:      ajaxurl,
-            type:     "POST",
+            url: ajaxurl,
+            type: "POST",
             data: $("#library-reports-report-form").serialize(),
-            success: (response) => { 
+            success: (response) => {
                 document.querySelector("#resultsFor").innerHTML = response.data;
                 document.dispatchEvent(new Event("wp-updates-notice-added"));
                 window.scroll({
-                    top: 0, 
-                    left: 0, 
-                    behavior: 'smooth' 
+                    top: 0,
+                    left: 0,
+                    behavior: 'smooth'
                 });
-             },
-            error: function(response) {
+            },
+            error: function (response) {
                 console.log("Произошла ошибка при отправке формы: " + response);
             },
         });
     });
 
     function getSingleReport(date) {
-        let data = 'library='+$("#library").val()+
-        '&date='+date+
-        '&action=library_reports_get_single_report'+
-        '&_wpnonce='+$("#_wpnonce").val();
+        let data = 'library=' + $("#library").val() +
+            '&date=' + date +
+            '&action=library_reports_get_single_report' +
+            '&_wpnonce=' + $("#_wpnonce").val();
         $.ajax({
-            url:      ajaxurl,
-            type:     "POST",
+            url: ajaxurl,
+            type: "POST",
             data: data,
             success: (response) => {
                 putCompletedReport(JSON.parse(response.data[0].content));
             },
-            error: function(response) {
+            error: function (response) {
                 console.log("Произошла ошибка при получении отчета: " + response);
             },
         });
     }
 
     function putCompletedReport(content) {
-        for(let name in content) {
-            $("#"+name).val(content[name]);
+        for (let name in content) {
+            $("#" + name).val(content[name]);
         }
     }
 
     function clearForm() {
         let toClear = ['tBookPeople', 'booksOut', 'booksIn', 'tEvntIn', 'tPplIn14', 'tPplIn1530', 'tPplIn30', 'tPplInFree', 'tPplInPaid', 'tPplOut', 'tPplOut14', 'tPplOut1530', 'tPplOut30', 'tPplOutFree', 'tPplOutPaid', 'tIncome', 'ecb', 'tRegPplWithAgreement'];
         toClear.forEach((val) => {
-            $("#"+val).val('');
+            $("#" + val).val('');
         });
     }
 });

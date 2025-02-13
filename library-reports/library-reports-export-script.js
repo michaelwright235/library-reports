@@ -6,26 +6,26 @@ LIBRARY_REPORTS_ADDITIONAL_FIELD_NAMES['totalEventsIn'] = '<i>Общее кол-
 LIBRARY_REPORTS_ADDITIONAL_FIELD_NAMES['totalEvents'] = '<i>Общее кол-во мероприятий</i>';
 LIBRARY_REPORTS_ADDITIONAL_FIELD_NAMES['totalRegUsers'] = '<i>Общее кол-во зарегистрированных пользователей</i>';
 
-jQuery(document).ready(function($) {
+jQuery(document).ready(function ($) {
     const reportResults = document.querySelector("#reportResults");
     // Настройка полей дат
     let params = {
         maxDate: 0,
         dateFormat: "yy-mm-dd"
     };
-    $("#datepickerFrom").datepicker(params).on("change", function() {
-            $("#datepickerTo").datepicker( "option", "minDate", getDate( this ) );
-        });
-    $("#datepickerTo").datepicker(params).on( "change", function() {
-        $("#datepickerFrom").datepicker( "option", "maxDate", getDate( this ) );
+    $("#datepickerFrom").datepicker(params).on("change", function () {
+        $("#datepickerTo").datepicker("option", "minDate", getDate(this));
+    });
+    $("#datepickerTo").datepicker(params).on("change", function () {
+        $("#datepickerFrom").datepicker("option", "maxDate", getDate(this));
     });
     $("#datepickerSingleDate").datepicker(params);
-    
-    function getDate( element ) {
+
+    function getDate(element) {
         let date;
         try {
-            date = jQuery.datepicker.parseDate( "yy-mm-dd", element.value );
-        } catch( error ) {
+            date = jQuery.datepicker.parseDate("yy-mm-dd", element.value);
+        } catch (error) {
             date = null;
             console.log("Произошла ошибка парсинга даты: " + error);
         }
@@ -36,11 +36,11 @@ jQuery(document).ready(function($) {
     document.querySelector("#library-reports-export-form").addEventListener('submit', (e) => {
         e.preventDefault();
         $.ajax({
-            url:      ajaxurl,
-            type:     "POST",
+            url: ajaxurl,
+            type: "POST",
             data: $("#library-reports-export-form").serialize(),
             success: (response) => { processResponse(response); },
-            error: function(response) {
+            error: function (response) {
                 console.log("Произошла ошибка при выгрузке данных: " + response);
             }
         });
@@ -49,12 +49,12 @@ jQuery(document).ready(function($) {
     function processResponse(response) {
         reportResults.innerHTML = "";
         if (response.data.length == 1) {
-            if(response.data[0].content !== undefined) {
+            if (response.data[0].content !== undefined) {
                 drawOneDayReport(response.data[0]);
-            } else if(response.data[0][0] !== undefined) {
+            } else if (response.data[0][0] !== undefined) {
                 drawIntervalReport(response);
             }
-        } 
+        }
         else if (response.data.length > 1) {
             drawIntervalReport(response);
         }
@@ -68,22 +68,22 @@ jQuery(document).ready(function($) {
         let reportDate = report.report_date;
         let content = JSON.parse(report.content);
 
-        reportResults.innerHTML += "<h2>"+getLibraryName(libraryId)+"</h2>";
-        reportResults.innerHTML += "<h3>Дата: "+reportDate+"</h3>";
+        reportResults.innerHTML += "<h2>" + getLibraryName(libraryId) + "</h2>";
+        reportResults.innerHTML += "<h3>Дата: " + reportDate + "</h3>";
         drawTable(content);
     }
 
     function drawIntervalReport(response) {
         let exportSeparatly = document.querySelector("#exportSeparatly").checked;
-        if(exportSeparatly) {
-            for(let i = 0; i < response.data.length; i++) {
+        if (exportSeparatly) {
+            for (let i = 0; i < response.data.length; i++) {
                 drawOneDayReport(response.data[i][0]);
             }
             return;
         }
 
         let contents = JSON.parse(JSON.stringify(LIBRARY_REPORTS_FIELD_NAMES)); // clone
-        for(key in contents) {
+        for (key in contents) {
             contents[key] = 0;
         }
 
@@ -91,22 +91,22 @@ jQuery(document).ready(function($) {
         let dateFrom = document.querySelector("#datepickerFrom").value;
         let dateTo = document.querySelector("#datepickerTo").value;
         reportResults.innerHTML = "";
-        reportResults.innerHTML += "<h2>"+getLibraryName(libraryId)+"</h2>";
-        reportResults.innerHTML += "<h3>Дата: с "+escapeHtml(dateFrom)+" по "+escapeHtml(dateTo)+"</h3>";
+        reportResults.innerHTML += "<h2>" + getLibraryName(libraryId) + "</h2>";
+        reportResults.innerHTML += "<h3>Дата: с " + escapeHtml(dateFrom) + " по " + escapeHtml(dateTo) + "</h3>";
 
         let dates = [];
         // Суммируем все строки
-        for(let i = 0; i < response.data.length; i++) {
+        for (let i = 0; i < response.data.length; i++) {
             let currentData = response.data[i][0];
             let currentContent = JSON.parse(currentData.content);
             dates.push(currentData.report_date);
-            for(let name in contents) {
-                if(currentContent[name]) { // проверка на то, если в данном отчете это поле
+            for (let name in contents) {
+                if (currentContent[name]) { // проверка на то, если в данном отчете это поле
                     contents[name] += parseInt(currentContent[name]);
                 }
             }
         }
-        reportResults.innerHTML += "<h4>"+dates.join(', ')+"</h4>";
+        reportResults.innerHTML += "<h4>" + dates.join(', ') + "</h4>";
         writeAdditionalRows(contents);
         drawTable(contents);
     }
@@ -118,9 +118,9 @@ jQuery(document).ready(function($) {
             content.booksOut30;
         content["totalUsers"] =
             content.tBookPeople +
-            content.tPplInFree + 
-            content.tPplInPaid + 
-            content.tPplOutFree + 
+            content.tPplInFree +
+            content.tPplInPaid +
+            content.tPplOutFree +
             content.tPplOutPaid;
         content["totalFreeUsers"] =
             content.tBookPeople +
@@ -144,7 +144,7 @@ jQuery(document).ready(function($) {
     function getLibraryName(libraryId) {
         let result = libraryId;
         LIBRARY_REPORTS_LIBS.forEach(element => {
-            if(element.id === libraryId) {
+            if (element.id === libraryId) {
                 result = element.name;
             }
         });
@@ -156,16 +156,16 @@ jQuery(document).ready(function($) {
         html += '<p><a href="javascript:window.print();" id="reportPrint"><span class="dashicons dashicons-printer"></span></a></p>';
 
         html += "<table class='library_export_result'>";
-        for(let name in LIBRARY_REPORTS_FIELD_NAMES) {
-            if(content.hasOwnProperty(name)) {
+        for (let name in LIBRARY_REPORTS_FIELD_NAMES) {
+            if (content.hasOwnProperty(name)) {
                 html += "<tr>";
                 html += "<th>" + LIBRARY_REPORTS_FIELD_NAMES[name] + "</th>";
                 html += "<td>" + escapeHtml(content[name]) + "</td>";
                 html += "</tr>";
             }
         }
-        for(let name in LIBRARY_REPORTS_ADDITIONAL_FIELD_NAMES) {
-            if(content.hasOwnProperty(name)) {
+        for (let name in LIBRARY_REPORTS_ADDITIONAL_FIELD_NAMES) {
+            if (content.hasOwnProperty(name)) {
                 html += "<tr>";
                 html += "<th>" + LIBRARY_REPORTS_ADDITIONAL_FIELD_NAMES[name] + "</th>";
                 html += "<td>" + escapeHtml(content[name]) + "</td>";
@@ -176,7 +176,7 @@ jQuery(document).ready(function($) {
         reportResults.innerHTML += html;
 
         document.querySelector("#wrap2").scrollIntoView({
-            behavior: 'smooth' 
+            behavior: 'smooth'
         });
     }
 

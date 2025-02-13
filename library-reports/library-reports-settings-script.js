@@ -2,13 +2,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const form = document.querySelector("#library-reports-settings-form");
 
     function initTable() {
-        if(Object.keys(JSONdata).length != 0)
-            for(const line of JSONdata) {
+        if (Object.keys(JSONdata).length != 0)
+            for (const line of JSONdata) {
                 addLine(line['id'], line['name'], line['rights'], line['category']);
             }
     }
-    
-    function addLine(id = '', name = '', rights= '', category='') {
+
+    function addLine(id = '', name = '', rights = '', category = '') {
         const table = document.querySelector("#libraries_table");
         const tr = document.createElement("tr");
 
@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let opt = document.createElement("option");
             opt.value = e.id;
             opt.textContent = e.name;
-            if(rights.includes(e.id)) opt.selected = true;
+            if (rights.includes(e.id)) opt.selected = true;
             selectUsers.append(opt);
         });
         tdRights.append(selectUsers);
@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
             selectCategory.append(opt);
         });
         selectCategory.value = category;
-        
+
         tdCategory.append(selectCategory);
         tr.append(tdCategory);
 
@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function createInput(name, val = '') {
         const input = document.createElement("input");
         input.type = "text";
-        if(val != '') input.value = val;
+        if (val != '') input.value = val;
         input.classList.add(name);
         return input;
     }
@@ -63,16 +63,16 @@ document.addEventListener('DOMContentLoaded', () => {
     function createJSON() {
         const lines = document.querySelectorAll("#libraries_table > tr");
         let libraries = [];
-        for(const line of lines) {
+        for (const line of lines) {
             let params = {};
             params.id = line.querySelector(".id").value;
-            if(params.id.trim() == '') continue;
+            if (params.id.trim() == '') continue;
 
             params.name = line.querySelector(".name").value;
             let rightsSelector = line.querySelector(".rights");
             let selectedRights = [];
-            for(o of rightsSelector) {
-                if(o.selected) selectedRights.push(o.value);
+            for (o of rightsSelector) {
+                if (o.selected) selectedRights.push(o.value);
             };
             params.rights = selectedRights.join(',');
 

@@ -3,7 +3,8 @@
 /**
  * Перечисление типов полей отчета
  */
-enum ReportFieldType {
+enum ReportFieldType
+{
     /**
      * Отображается только название поля слева в таблице (заглушка)
      */
@@ -29,11 +30,13 @@ enum ReportFieldType {
 /**
  * Класс для одного поля отчета
  */
-class ReportField {
+class ReportField
+{
     private string $name, $desc;
     private ReportFieldType $type;
 
-    public function __construct(string $name, string $desc, ReportFieldType $type) {
+    public function __construct(string $name, string $desc, ReportFieldType $type)
+    {
         $this->name = $name;
         $this->desc = $desc;
         $this->type = $type;
@@ -44,7 +47,8 @@ class ReportField {
      *
      * @return string
      */
-    private function get_label() : string { 
+    private function get_label(): string
+    {
         return sprintf('<label for="%s">%s</label>', $this->name, $this->desc);
     }
 
@@ -53,7 +57,8 @@ class ReportField {
      *
      * @return string
      */
-    private function get_numeric_input() : string {
+    private function get_numeric_input(): string
+    {
         return sprintf('<input type="text" autocomplete="off" inputmode="numeric" name="%1$s" id="%1$s">', $this->name);
     }
 
@@ -62,7 +67,8 @@ class ReportField {
      *
      * @return string
      */
-    private function get_date_input() : string {
+    private function get_date_input(): string
+    {
         return sprintf('<input type="text" autocomplete="off" id="datepicker" readonly name="%s">', $this->name);
     }
 
@@ -71,7 +77,8 @@ class ReportField {
      *
      * @return string
      */
-    private function get_library_select_input() : string {
+    private function get_library_select_input(): string
+    {
         return LibraryReportsCommon::create_library_select_input($this->name);
     }
 
@@ -81,7 +88,8 @@ class ReportField {
      *
      * @return string
      */
-    public function get_field_name() : string {
+    public function get_field_name(): string
+    {
         if ($this->type == ReportFieldType::FieldNameOnly)
             return $this->desc;
         if ($this->type == ReportFieldType::FieldValueOnly)
@@ -95,9 +103,10 @@ class ReportField {
      *
      * @return string
      */
-    public function get_field_value() : string {
+    public function get_field_value(): string
+    {
         $html = '';
-        switch($this->type) {
+        switch ($this->type) {
             case ReportFieldType::Numeric:
                 $html = self::get_numeric_input();
                 break;
@@ -114,9 +123,10 @@ class ReportField {
         return $html;
     }
 
-    public static function array_to_fields(array $arr) : array {
+    public static function array_to_fields(array $arr): array
+    {
         $fields = [];
-        foreach($arr as $f) {
+        foreach ($arr as $f) {
             array_push($fields, new self($f[0], $f[1], $f[2]));
         }
         return $fields;
@@ -126,7 +136,8 @@ class ReportField {
 /**
  * Класс общих для других функций и констант
  */
-class LibraryReportsCommon {
+class LibraryReportsCommon
+{
     /**
      * @var array<string,string,ReportFieldType> Поля отчета в формате [$name, $description, $type : ReportFieldType].
      */
@@ -135,7 +146,7 @@ class LibraryReportsCommon {
         ['date', 'Дата', ReportFieldType::Date],
         ['tBookPeople', 'Число посещений для получения библиотечно-информационных услуг', ReportFieldType::Numeric],
         ['booksOut14', 'Количество выданной литературы для людей до 14 лет включительно', ReportFieldType::Numeric],
-        ['booksOut1530' ,'Количество выданной литературы для людей 15-30 лет включительно', ReportFieldType::Numeric],
+        ['booksOut1530', 'Количество выданной литературы для людей 15-30 лет включительно', ReportFieldType::Numeric],
         ['booksOut30', 'Количество выданной литературы для людей старше 30 лет', ReportFieldType::Numeric],
         ['', '<h2>Мероприятия в стационаре</h2>', ReportFieldType::FieldNameOnly],
         ['tEvntInFor14', 'Количество мероприятий в стационаре для людей до 14 лет включительно', ReportFieldType::Numeric],
@@ -147,7 +158,7 @@ class LibraryReportsCommon {
         //['tEvntOutFor14', 'Количество мероприятий вне стационара для людей до 14 лет включительно', ReportFieldType::Numeric],
         //['tEvntOutFor1530', 'Количество мероприятий вне стационара для людей 15-30 лет включительно', ReportFieldType::Numeric],
         //['tEvntOutFor30', 'Количество мероприятий вне стационара для людей старше 30 лет', ReportFieldType::Numeric],
-        ['tPplOut','Количество мероприятий вне стационара', ReportFieldType::Numeric],
+        ['tPplOut', 'Количество мероприятий вне стационара', ReportFieldType::Numeric],
         ['tPplOutFree', 'Посетили мероприятия вне стационара бесплатно', ReportFieldType::Numeric],
         ['tPplOutPaid', 'Посетили мероприятия вне стационара платно', ReportFieldType::Numeric],
         ['', '<h2>Зарегистрированные пользователи</h2>', ReportFieldType::FieldNameOnly],
@@ -161,9 +172,10 @@ class LibraryReportsCommon {
      *
      * @return array<string,string,ReportFieldType>
      */
-    public static function get_valueble_fields() : array{
+    public static function get_valueble_fields(): array
+    {
         $fields = [];
-        foreach(self::FIELDS as $f) {
+        foreach (self::FIELDS as $f) {
             if ($f[0] == '' || $f[0] == 'date' || $f[0] == 'library')
                 continue;
             array_push($fields, $f);
@@ -176,16 +188,17 @@ class LibraryReportsCommon {
      *
      * @return array Массив с объектами библиотек. Объект содержит поля id, name, rights.
      */
-    public static function get_available_libraries() : array {
+    public static function get_available_libraries(): array
+    {
         $optLibs = json_decode(get_option(LibraryReportsSettings::SETTINGS_OPT_LIBRARIES));
-        if ( current_user_can( 'manage_options' ) ) {
+        if (current_user_can('manage_options')) {
             return $optLibs; // Разрешаем админам все :)
         }
         $currentUserId = get_current_user_id();
         $availableLibraries = [];
-        foreach($optLibs as $lib) {
+        foreach ($optLibs as $lib) {
             $rights = explode(',', $lib->rights);
-            if(!in_array($currentUserId, $rights)) continue;
+            if (!in_array($currentUserId, $rights)) continue;
             $availableLibraries[] = $lib;
         }
         return $availableLibraries;
@@ -197,10 +210,11 @@ class LibraryReportsCommon {
      * @param string $id ID библиотеки
      * @return boolean
      */
-    public static function is_library_available(string $id) : bool {
+    public static function is_library_available(string $id): bool
+    {
         $availableLibraries = self::get_available_libraries();
-        foreach($availableLibraries as $lib) {
-            if($id === $lib->id) return true;
+        foreach ($availableLibraries as $lib) {
+            if ($id === $lib->id) return true;
         }
         return false;
     }
@@ -212,10 +226,11 @@ class LibraryReportsCommon {
      * @param string $inputName Тег name для элемента
      * @return string HTML-код
      */
-    public static function create_library_select_input(string $inputName) : string {
+    public static function create_library_select_input(string $inputName): string
+    {
         $availableLibraries = self::get_available_libraries();
         $selectHtml = sprintf('<select name="%1$s" id="%1$s">', $inputName);
-        foreach($availableLibraries as $lib) {
+        foreach ($availableLibraries as $lib) {
             $selectHtml .= sprintf('<option value="%s">%s</option>', $lib->id, $lib->name);
         }
         $selectHtml .= '</select>';
@@ -228,12 +243,13 @@ class LibraryReportsCommon {
      * @param integer $daysAgo На сколько дней искать назад 
      * @return array
      */
-    public static function get_completed_reports(int $daysAgo) : array {
+    public static function get_completed_reports(int $daysAgo): array
+    {
         $completed_reports = [];
         $availableLibraries = self::get_available_libraries();
-        foreach($availableLibraries as $lib) {
+        foreach ($availableLibraries as $lib) {
             $dateTo = new DateTime('now');
-            $dateFrom = new DateTime('now'); 
+            $dateFrom = new DateTime('now');
             $dateFrom->modify("-$daysAgo day");
             $completed_reports[$lib->id] = LibraryReportsDb::get_reports_between_dates(
                 $lib->id,
@@ -244,10 +260,11 @@ class LibraryReportsCommon {
         return $completed_reports;
     }
 
-    public static function get_all_completed_reports() {
+    public static function get_all_completed_reports()
+    {
         $completed_reports = [];
         $availableLibraries = self::get_available_libraries();
-        foreach($availableLibraries as $lib) {
+        foreach ($availableLibraries as $lib) {
             $completed_reports[$lib->id] = LibraryReportsDb::get_all_library_reports_dates($lib->id);
         }
         return $completed_reports;
@@ -259,8 +276,9 @@ class LibraryReportsCommon {
      * @param array $report
      * @return void
      */
-    public static function sendReportViaMail($report) {
-        if(current_user_can( 'manage_options' )) {
+    public static function sendReportViaMail($report)
+    {
+        if (current_user_can('manage_options')) {
             return;
         }
         $content = '';
@@ -268,22 +286,22 @@ class LibraryReportsCommon {
         $libId = $report['library'];
         $optLibs = json_decode(get_option(LibraryReportsSettings::SETTINGS_OPT_LIBRARIES));
         $libName = '';
-        foreach($optLibs as $lib) {
-            if($lib->id == $libId) $libName = $lib->name;
+        foreach ($optLibs as $lib) {
+            if ($lib->id == $libId) $libName = $lib->name;
         }
         $content .= "<h2>$libName</h2>";
-        $content .= "<h3>Дата: " .$report['date']. "</h3>";
+        $content .= "<h3>Дата: " . $report['date'] . "</h3>";
         $content .= '<table border="1" bordercolor="#858585" cellspacing="0">';
 
         $fields = [];
-        foreach(LibraryReportsCommon::get_valueble_fields() as $f) {
+        foreach (LibraryReportsCommon::get_valueble_fields() as $f) {
             $fields[$f[0]] = $report[$f[0]];
         }
-        foreach($fields as $f => $v) {
+        foreach ($fields as $f => $v) {
             $fname = '';
             // Поиск названия поля
-            foreach(LibraryReportsCommon::FIELDS as $a) {
-                if($a[0] == $f) {
+            foreach (LibraryReportsCommon::FIELDS as $a) {
+                if ($a[0] == $f) {
                     $fname = $a[1];
                 }
             }
@@ -297,11 +315,11 @@ class LibraryReportsCommon {
         $email = wp_get_current_user()->user_email;
         $subject = 'Отчет за ' . $report['date'];
 
-        add_filter( 'wp_mail_content_type', function( $content_type ) {
+        add_filter('wp_mail_content_type', function ($content_type) {
             return "text/html";
-        } );
-        
-        wp_mail( $email, $subject, $content );
+        });
+
+        wp_mail($email, $subject, $content);
     }
 
     /**
@@ -311,11 +329,12 @@ class LibraryReportsCommon {
      * @param boolean $isError Если ошибка, то будет красное уведомление, если нет - зеленое
      * @return string HTML уведомления
      */
-    public static function get_wp_notification(string $text, bool $isError = true) : string {
+    public static function get_wp_notification(string $text, bool $isError = true): string
+    {
         ob_start();
         $type = $isError ? 'error' : 'updated';
-        add_settings_error( 'library_reports_messages', 'library_reports_message', $text, $type );
-        settings_errors( 'library_reports_messages' );
+        add_settings_error('library_reports_messages', 'library_reports_message', $text, $type);
+        settings_errors('library_reports_messages');
         $contents = ob_get_contents();
         ob_end_clean();
         return $contents;
