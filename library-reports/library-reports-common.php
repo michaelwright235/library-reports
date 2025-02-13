@@ -154,6 +154,7 @@ class LibraryReportsCommon
         ['tEvntInFor30', 'Количество мероприятий в стационаре для людей старше 30 лет', ReportFieldType::Numeric],
         ['tPplInFree', 'Посетили мероприятия в стационаре бесплатно', ReportFieldType::Numeric],
         ['tPplInPaid', 'Посетили мероприятия в стационаре платно', ReportFieldType::Numeric],
+        ['tPplInElder', 'Количество пенсионеров, посетивших любые мероприятия', ReportFieldType::Numeric],
         ['', '<h2>Мероприятия вне стационара</h2>', ReportFieldType::FieldNameOnly],
         //['tEvntOutFor14', 'Количество мероприятий вне стационара для людей до 14 лет включительно', ReportFieldType::Numeric],
         //['tEvntOutFor1530', 'Количество мероприятий вне стационара для людей 15-30 лет включительно', ReportFieldType::Numeric],
